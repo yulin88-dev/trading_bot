@@ -18,4 +18,4 @@ order = MarketOrderRequest(
 )
 
 result = client.submit_order(order)
-print(f"Order submitted: {result.id}, status: {result.status}")1
+print(f"Order submitted: {result.id}, status: {result.status}")
