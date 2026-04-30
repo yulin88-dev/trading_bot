@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 
+from alpaca.data.enums import DataFeed
 from alpaca.data.historical.news import NewsClient
 from alpaca.data.historical.stock import StockHistoricalDataClient
 from alpaca.data.requests import (
@@ -47,6 +48,7 @@ def get_bars(symbol: str, days: int) -> list[dict]:
         start=start,
         end=end,
         adjustment="all",
+        feed=DataFeed.IEX,
     )
     response = _bars_client().get_stock_bars(request)
     rows = response.data.get(symbol, [])
@@ -66,7 +68,7 @@ def get_bars(symbol: str, days: int) -> list[dict]:
 
 def get_snapshot(symbol: str) -> dict:
     """Latest snapshot quote — price, daily % change, volume."""
-    request = StockSnapshotRequest(symbol_or_symbols=symbol)
+    request = StockSnapshotRequest(symbol_or_symbols=symbol, feed=DataFeed.IEX)
     snapshot = _bars_client().get_stock_snapshot(request)
     s = snapshot[symbol]
 
