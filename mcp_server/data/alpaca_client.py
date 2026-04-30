@@ -51,7 +51,9 @@ def get_bars(symbol: str, days: int) -> list[dict]:
         feed=DataFeed.IEX,
     )
     response = _bars_client().get_stock_bars(request)
-    rows = response.data.get(symbol, [])
+    rows = response.data.get(symbol) or []
+    if not rows:
+        raise RuntimeError(f"Alpaca returned no bars for {symbol}")
     bars = [
         {
             "date": b.timestamp.date().isoformat(),
@@ -70,7 +72,9 @@ def get_snapshot(symbol: str) -> dict:
     """Latest snapshot quote — price, daily % change, volume."""
     request = StockSnapshotRequest(symbol_or_symbols=symbol, feed=DataFeed.IEX)
     snapshot = _bars_client().get_stock_snapshot(request)
-    s = snapshot[symbol]
+    s = snapshot.get(symbol)
+    if s is None:
+        raise RuntimeError(f"Alpaca returned no snapshot for {symbol}")
 
     latest_trade = s.latest_trade
     daily_bar = s.daily_bar
