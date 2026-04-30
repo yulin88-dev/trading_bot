@@ -6,9 +6,8 @@ markdown document, and writes it to ./reports/weekly_report_YYYY-MM-DD.md.
 from __future__ import annotations
 
 from datetime import date, datetime, timedelta
-from pathlib import Path
 
-from mcp_server.config import normalize_symbol
+from mcp_server.config import REPORTS_DIR, normalize_symbol
 from mcp_server.report import templates
 from mcp_server.tools.analysis_tools import (
     compare_to_benchmark,
@@ -23,7 +22,6 @@ from mcp_server.tools.data_tools import (
 )
 
 REPORT_SYMBOLS = ("TSLA", "BRK-B", "BTC")
-REPORTS_DIR = Path("reports")
 
 # Bars to fetch when computing YTD — covers Jan 1 even early in the year.
 _YTD_BARS = 300

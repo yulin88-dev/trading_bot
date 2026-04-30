@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "trading-bot": {
-      "command": "/Users/yulin/projects/trading_bot/.venv/bin/python",
+      "command": "/Library/Frameworks/Python.framework/Versions/3.10/bin/python3",
       "args": ["-m", "mcp_server.server"],
       "cwd": "/Users/yulin/projects/trading_bot",
       "env": {

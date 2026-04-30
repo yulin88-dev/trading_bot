@@ -8,37 +8,62 @@ Two parts live here:
    - `buy_tsla.py` — submit a market-on-open buy order for TSLA.
    - `get_positions.py` — list current open positions.
 2. **MCP server (`mcp_server/`)** — exposes weekly market analysis tools to
-   Claude Desktop. Generates a markdown report for TSLA, BRK-B, and BTC.
-   See [DESIGN.md](DESIGN.md) for the full design.
+   Claude Desktop. Generates a markdown report for **TSLA**, **BRK-B**, and
+   **BTC**. See [DESIGN.md](DESIGN.md) for the full design.
 
 ## Requirements
 
 - Python 3.10+
 - An Alpaca paper-trading account ([alpaca.markets](https://alpaca.markets))
-- macOS (Claude Desktop supported on macOS and Windows)
+- macOS (Claude Desktop is supported on macOS and Windows)
 
-## Setup
+## Quickstart
 
 ```bash
-cd /Users/yulin/projects/trading_bot
-
-# Create and activate a virtualenv
-python3 -m venv .venv
-source .venv/bin/activate
-
-# Install in editable mode with dev deps
-pip install -e ".[dev]"
-
-# Configure environment variables
-cp .env.example .env
-# then edit .env and fill in your Alpaca paper credentials
+make install         # installs the package + dev deps in editable mode
+cp .env.example .env # then edit .env with your Alpaca paper credentials
+make test            # 17 unit tests should pass
+make smoke-data      # end-to-end check of data tools (live API calls)
+make smoke-analysis  # end-to-end check of analysis tools
+make report          # generates this week's report under reports/
 ```
 
-Load `.env` into your shell before running scripts:
+## Make targets
+
+| Target | What it does |
+|---|---|
+| `make install` | `pip install -e ".[dev]"` |
+| `make test` | Run the unit tests in `tests/` |
+| `make smoke-data` | Hit Alpaca + CoinGecko + yfinance for TSLA / BRK-B / BTC |
+| `make smoke-analysis` | Run all 4 analysis tools end-to-end |
+| `make report` | Generate `reports/weekly_report_YYYY-MM-DD.md` |
+| `make run` | Launch the MCP server over stdio (for debugging) |
+| `make register-help` | Print a ready-to-paste Claude Desktop config block |
+| `make clean` | Remove caches and `reports/` |
+
+## Environment variables
+
+Configured via a local `.env` file (gitignored). Copy from `.env.example`:
+
+| Variable | Required | Purpose |
+|---|---|---|
+| `ALPACA_API_KEY` | yes | Alpaca paper-trading API key |
+| `ALPACA_SECRET_KEY` | yes | Alpaca paper-trading API secret |
+
+Load `.env` into your shell before running scripts directly:
 
 ```bash
 set -a && source .env && set +a
 ```
+
+Claude Desktop launches the server with its own env block, so the `.env`
+file is only needed when running scripts manually from the terminal.
+
+> **Note on Alpaca data feeds:** free Alpaca paper accounts only have
+> access to the **IEX** feed (SIP requires a paid subscription). The
+> server passes `feed=DataFeed.IEX` automatically. For symbols not in the
+> IEX response (e.g., **BRK-B** at the time of writing), the server falls
+> back to **yfinance** transparently.
 
 ## Running the standalone scripts
 
@@ -47,28 +72,40 @@ python3 buy_tsla.py
 python3 get_positions.py
 ```
 
-## Running the MCP server
+## Registering the MCP server with Claude Desktop
 
-The server uses **stdio** transport, so it is launched by an MCP client
-(Claude Desktop), not run directly. To smoke-test that the module loads:
+The server uses **stdio** transport — Claude Desktop launches it on demand.
 
-```bash
-python3 -m mcp_server.server
-# (it will sit waiting for MCP messages on stdin; Ctrl-C to exit)
-```
-
-### Register with Claude Desktop
-
-1. Open Claude Desktop's config file:
+1. Generate a config block with absolute paths:
+   ```bash
+   make register-help
+   ```
+2. Open the Claude Desktop config:
    ```bash
    open -e ~/Library/Application\ Support/Claude/claude_desktop_config.json
    ```
-2. Merge the snippet from [claude_desktop_config.example.json](claude_desktop_config.example.json)
-   into the `mcpServers` block. Replace the placeholder credentials with your
-   real paper keys (or omit the `env` block if you've already exported them in
-   the shell that launches Claude Desktop).
-3. Quit Claude Desktop completely and reopen it.
-4. In a new chat, the trading-bot tools should appear in the tools menu.
+3. Merge the printed `trading-bot` entry into the `mcpServers` block, replacing
+   the placeholder credentials with your real Alpaca paper keys.
+4. Quit Claude Desktop completely (Cmd+Q) and reopen it.
+5. In a new chat, the **trading-bot** tools should appear in the tools menu.
+
+## Sample Claude Desktop prompts
+
+Once the server is registered, paste any of these into a Claude Desktop chat
+to exercise the full pipeline:
+
+1. **Quick market check**
+   > Use the trading-bot tools to show me the current price and 7-day
+   > performance of TSLA, BRK-B, and BTC. Format the result as a small table.
+
+2. **Single-asset deep dive**
+   > Run a full technical analysis on BTC: RSI, SMA crossovers, MACD, and
+   > 30-day volatility vs prior 30 days. Tell me whether the trend looks
+   > bullish or bearish and why.
+
+3. **Generate the weekly report**
+   > Generate this week's market report and tell me the file path. Then read
+   > the report and summarize the three biggest takeaways for me.
 
 ## Project layout
 
@@ -78,20 +115,23 @@ trading_bot/
 ├── get_positions.py
 ├── DESIGN.md
 ├── MCP_SERVER_PROMPTS.md
+├── Makefile
 ├── pyproject.toml
 ├── claude_desktop_config.example.json
 ├── .env.example
+├── reports/                 # generated reports (gitignored)
+├── scripts/
+│   ├── smoke_test_data.py
+│   ├── smoke_test_analysis.py
+│   └── print_claude_config.py
+├── tests/
+│   └── test_analysis.py     # 17 unit tests for the math
 └── mcp_server/
     ├── server.py            # entry point (stdio transport)
-    ├── config.py            # env vars + symbol mapping
-    ├── data/                # vendor API clients
-    ├── analysis/            # math (RSI, SMA, vol, etc.)
+    ├── config.py            # env vars, paths, symbol mapping
+    ├── logging_setup.py     # stderr logging + per-tool tracing
+    ├── data/                # vendor API clients (Alpaca, CoinGecko, yfinance)
+    ├── analysis/            # math (RSI, SMA, vol, benchmark)
     ├── report/              # markdown report assembly
-    └── tools/               # MCP tool wrappers (currently stubs)
+    └── tools/               # MCP tool wrappers
 ```
-
-## Status
-
-The MCP server is **scaffolded with stubs only** — every tool returns a
-placeholder `{"_stub": True, ...}` payload. Real logic lands in subsequent
-prompts (see [MCP_SERVER_PROMPTS.md](MCP_SERVER_PROMPTS.md)).
