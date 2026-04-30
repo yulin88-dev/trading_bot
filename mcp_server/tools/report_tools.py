@@ -1,5 +1,11 @@
-"""MCP tool stub for report generation. Real logic lands in Prompt 5."""
+"""MCP tool for weekly report generation."""
 from __future__ import annotations
+
+import logging
+
+from mcp_server.report.generator import generate_weekly_report as _generate
+
+log = logging.getLogger(__name__)
 
 
 def generate_weekly_report(week_ending: str | None = None) -> dict:
@@ -9,11 +15,11 @@ def generate_weekly_report(week_ending: str | None = None) -> dict:
         week_ending: Optional ISO date (YYYY-MM-DD); defaults to most recent Friday.
 
     Returns:
-        Dict with file_path, summary, week_ending_date.
+        Dict with file_path (absolute), summary (one-line description),
+        week_ending_date (ISO date).
     """
-    return {
-        "_stub": True,
-        "file_path": None,
-        "summary": "Stub — report generation not implemented yet.",
-        "week_ending_date": week_ending,
-    }
+    try:
+        return _generate(week_ending)
+    except Exception as e:
+        log.exception("generate_weekly_report failed")
+        return {"error": str(e), "week_ending_date": week_ending}
