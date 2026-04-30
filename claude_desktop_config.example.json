@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "trading-bot": {
+      "command": "/Users/yulin/projects/trading_bot/.venv/bin/python",
+      "args": ["-m", "mcp_server.server"],
+      "cwd": "/Users/yulin/projects/trading_bot",
+      "env": {
+        "ALPACA_API_KEY": "your_paper_key_here",
+        "ALPACA_SECRET_KEY": "your_paper_secret_here"
+      }
+    }
+  }
+}
