@@ -21,7 +21,7 @@ from mcp_server.tools.data_tools import (
     get_price_history,
 )
 
-REPORT_SYMBOLS = ("TSLA", "BRK-B", "BTC")
+DEFAULT_REPORT_SYMBOLS = ("TSLA", "BRK-B", "BTC")
 
 # Bars to fetch when computing YTD — covers Jan 1 even early in the year.
 _YTD_BARS = 300
@@ -133,11 +133,15 @@ def _render_asset_section(asset: dict) -> str:
     return "\n".join(parts)
 
 
-def generate_weekly_report(week_ending: str | None = None) -> dict:
+def generate_weekly_report(
+    week_ending: str | None = None,
+    symbols: list[str] | None = None,
+) -> dict:
     """Build the weekly markdown report, save it, return path + summary.
 
     Args:
         week_ending: Optional ISO date (YYYY-MM-DD); defaults to most recent Friday.
+        symbols: Optional list of tickers; defaults to TSLA, BRK-B, BTC.
 
     Returns:
         Dict with file_path, summary, week_ending_date.
@@ -147,8 +151,9 @@ def generate_weekly_report(week_ending: str | None = None) -> dict:
     )
     year = week_ending_date.year
     iso = week_ending_date.isoformat()
+    report_symbols = list(symbols) if symbols else list(DEFAULT_REPORT_SYMBOLS)
 
-    assets = [_gather(s, year) for s in REPORT_SYMBOLS]
+    assets = [_gather(s, year) for s in report_symbols]
     rows = [_summary_row(a) for a in assets]
 
     sections: list[str] = [f"# Weekly Market Report — {iso}\n"]

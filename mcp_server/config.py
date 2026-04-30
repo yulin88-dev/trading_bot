@@ -28,7 +28,19 @@ SYMBOL_MAP: dict[str, dict[str, str | None]] = {
 
 
 def normalize_symbol(symbol: str) -> dict[str, str | None]:
+    """Map a user-supplied ticker to per-vendor identifiers.
+
+    Symbols in SYMBOL_MAP get an explicit mapping (handles BRK-B/BRKB
+    quirks, BTC/bitcoin coin IDs, etc.). Unknown tickers are treated as
+    US-listed stocks and pass through unchanged to Alpaca and yfinance.
+    To add a new crypto, add an entry to SYMBOL_MAP with a coingecko ID.
+    """
     key = symbol.upper().strip()
-    if key not in SYMBOL_MAP:
-        raise ValueError(f"Unsupported symbol: {symbol}")
-    return SYMBOL_MAP[key]
+    if key in SYMBOL_MAP:
+        return SYMBOL_MAP[key]
+    return {
+        "alpaca": key,
+        "yfinance": key,
+        "coingecko": None,
+        "display": key,
+    }

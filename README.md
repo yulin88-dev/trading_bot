@@ -89,23 +89,43 @@ The server uses **stdio** transport — Claude Desktop launches it on demand.
 4. Quit Claude Desktop completely (Cmd+Q) and reopen it.
 5. In a new chat, the **trading-bot** tools should appear in the tools menu.
 
+## Symbol coverage
+
+The data and analysis tools accept **any US-listed ticker** that Alpaca or
+yfinance recognizes (TSLA, AAPL, NVDA, BRK-B, …). A few symbols have explicit
+mappings in [config.py](mcp_server/config.py) to handle vendor quirks:
+
+- **BRK-B / BRK.B / BRKB** → all map to the same asset
+- **BTC / BITCOIN / BTC-USD** → routed to CoinGecko (with yfinance fallback)
+
+Other tickers fall back to the default routing (Alpaca primary, yfinance
+fallback). For new crypto, add an entry to `SYMBOL_MAP` with a CoinGecko ID.
+
+The `generate_weekly_report` tool defaults to **TSLA, BRK-B, BTC** but accepts
+a custom `symbols` list to override.
+
 ## Sample Claude Desktop prompts
 
 Once the server is registered, paste any of these into a Claude Desktop chat
 to exercise the full pipeline:
 
-1. **Quick market check**
+1. **Quick market check on any tickers**
    > Use the trading-bot tools to show me the current price and 7-day
-   > performance of TSLA, BRK-B, and BTC. Format the result as a small table.
+   > performance of NVDA, AAPL, and MSFT. Format the result as a small table.
 
 2. **Single-asset deep dive**
-   > Run a full technical analysis on BTC: RSI, SMA crossovers, MACD, and
+   > Run a full technical analysis on AMZN: RSI, SMA crossovers, MACD, and
    > 30-day volatility vs prior 30 days. Tell me whether the trend looks
    > bullish or bearish and why.
 
-3. **Generate the weekly report**
-   > Generate this week's market report and tell me the file path. Then read
-   > the report and summarize the three biggest takeaways for me.
+3. **Generate the weekly report (custom symbols)**
+   > Generate this week's market report for TSLA, NVDA, and BTC and tell me
+   > the file path. Then read the report and summarize the three biggest
+   > takeaways for me.
+
+4. **Default weekly report**
+   > Generate this week's default market report (TSLA, BRK-B, BTC) and walk
+   > me through the cross-asset comparison.
 
 ## Project layout
 
