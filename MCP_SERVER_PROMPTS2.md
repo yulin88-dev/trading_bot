@@ -8,16 +8,12 @@ queryable from Claude Desktop.
 
 Fill these in before using the prompts below:
 
-- **Storage backend**: SQLite (queryable, single file) or markdown files
-  (one per item, IDE-editable, git-friendly)
-- **Search**: simple `LIKE`-based, or full-text via SQLite FTS5
-- **Storage location**: project-local (`./library.db`), or
-  `~/.config/prompt-library/library.db` (cross-machine via dotfiles)
-- **Project schema**: minimum `{name, description, status, tags, links}`;
-  add `priority`, `deadline`, or `owner`?
-- **Prompt schema**: minimum `{title, body, tags, category, notes}`; do you
-  want revision history or last-used timestamps?
-- **Client**: Claude Desktop only, or also reachable from the Anthropic SDK?
+- **Storage backend**: SQLit
+- **Search**: full-text via SQLite FTS5
+- **Storage location**:  `~/.config/prompt-library/library.db` (cross-machine via dotfiles)
+- **Project schema**: minimum `{name, description, status, tags, links}`
+- **Prompt schema**: minimum `{title, body, tags, category, notes}` 
+- **Client**: reachable from the Anthropic SDK
 
 ---
 
@@ -36,13 +32,10 @@ Goals:
 - One source of truth per item (no duplication between cache and store).
 
 Please propose:
-1. Storage backend — recommend SQLite or markdown files. Justify the
-   choice with the tradeoffs (query speed, human editability, portability,
-   conflict-resolution if I sync via Dropbox/iCloud) and propose the schema.
-2. The MCP server's directory structure and module layout.
+1. Storage backend — I prefer a light weight database on cloud. Schema name chat_prompt
+2. The MCP server's directory structure and module layout- mcp_server_chat_prompt
 3. The exact list of MCP tools to expose (name, inputs, outputs, purpose).
-4. The data flow — how a tool call reads/writes storage and returns
-   results to the MCP client.
+4. The data flow — help me dive deeper into this
 5. Dependencies and a minimal pyproject.toml.
 
 Do not write code yet. I want a design doc first.

@@ -11,7 +11,7 @@ client = TradingClient(API_KEY, SECRET_KEY, paper=True)
 
 # Market order, Time-in-Force = OPG means "at market open"
 order = MarketOrderRequest(
-    symbol="BRKB",
+    symbol="BRK-B",
     qty=5,
     side=OrderSide.BUY,
     time_in_force=TimeInForce.OPG

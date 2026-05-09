@@ -9,18 +9,16 @@ server watches during market hours and emails you when an alert fires.
 
 Fill these in before using the prompts below:
 
-- **Email delivery**: Gmail SMTP (with app password) / SendGrid / Amazon SES /
+- **Email delivery**:
   system `mail` command
-- **Recipient**: a single email address, or a list
-- **Storage**: extend the trading-bot dir with `state.db` (new SQLite file),
-  or reuse the existing `reports/` directory pattern with JSON files
-- **Schedule trigger**: launchd timer (every 5 min during market hours),
-  cron, or on-demand only via MCP tool
+- **Recipient**: a single email address
+- **Storage**: reuse the existing `reports/` directory pattern with JSON files
+- **Schedule trigger**: launchd timer (every 10 min during market hours)
 - **Condition syntax**: canonical condition types with parameters
   (`price_below`, `rsi_below`, etc.) or a small DSL — recommend canonical
   for v2
-- **Cooldown default**: 24 h (one fire per day), 1 h, or per-alert
-- **Market calendar**: hand-rolled weekday check, or `pandas_market_calendars`
+- **Cooldown default**: 24 h (one fire per day)
+- **Market calendar**:  `pandas_market_calendars`
   for full NYSE holiday awareness
 
 ---
