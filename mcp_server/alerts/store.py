@@ -277,13 +277,14 @@ class AlertStore:
         alert_id: str,
         observed: dict[str, Any],
         message: str,
+        now: datetime | None = None,
     ) -> dict:
         alerts = self._load()
         idx = self._find_index(alerts, alert_id)
-        now = _now_iso()
+        ts = (now or datetime.now(timezone.utc)).strftime("%Y-%m-%dT%H:%M:%SZ")
         record = {
             "alert_id": alert_id,
-            "fired_at": now,
+            "fired_at": ts,
             "observed": observed,
             "message": message,
         }
@@ -291,8 +292,8 @@ class AlertStore:
         with self.fires_path.open("a", encoding="utf-8") as f:
             f.write(json.dumps(record) + "\n")
         # Update the alert's last_fired_at
-        alerts[idx]["last_fired_at"] = now
-        alerts[idx]["updated_at"] = now
+        alerts[idx]["last_fired_at"] = ts
+        alerts[idx]["updated_at"] = ts
         self._save_atomic(alerts)
         return record
 

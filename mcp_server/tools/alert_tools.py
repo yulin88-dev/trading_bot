@@ -128,13 +128,20 @@ def get_alert_history(alert_id: str | None = None, limit: int = 50) -> dict:
 
 
 def evaluate_alerts(symbol: str | None = None, dry_run: bool = False) -> dict:
-    """Run one evaluation pass — real logic lands in Prompt 4."""
-    return {
-        "_stub": True,
-        "evaluated": 0,
-        "fired": 0,
-        "suppressed_by_cooldown": 0,
-        "errors": [],
-        "fires": [],
-        "dry_run": dry_run,
-    }
+    """Run one evaluation pass across all active alerts.
+
+    Args:
+        symbol: Optional filter — only evaluate alerts on this symbol.
+        dry_run: If True, do not record fires (or send emails); return what
+            would have happened.
+
+    Returns:
+        Dict with evaluated, fired, suppressed_by_cooldown, errors, fires.
+    """
+    from mcp_server.alerts.evaluator import evaluate_alerts as _evaluate
+
+    try:
+        return _evaluate(symbol=symbol, dry_run=dry_run)
+    except Exception as e:
+        log.exception("evaluate_alerts failed")
+        return _error(str(e))
