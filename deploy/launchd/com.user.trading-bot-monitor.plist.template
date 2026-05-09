@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.user.trading-bot-monitor</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>{{python_path}}</string>
+        <string>-m</string>
+        <string>mcp_server.monitor</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>{{project_dir}}</string>
+
+    <!-- Fire every 10 minutes (600 s). The script itself short-circuits
+         when NYSE is closed, so there's no need for a complex
+         StartCalendarInterval array. launchd defers fires while the
+         laptop is asleep and runs once on wake. -->
+    <key>StartInterval</key>
+    <integer>600</integer>
+
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>StandardOutPath</key>
+    <string>{{log_dir}}/trading-bot-monitor.log</string>
+    <key>StandardErrorPath</key>
+    <string>{{log_dir}}/trading-bot-monitor.log</string>
+
+    <!-- env vars come from {{project_dir}}/.env via python-dotenv,
+         loaded by mcp_server/monitor.py. No need to duplicate them here. -->
+</dict>
+</plist>

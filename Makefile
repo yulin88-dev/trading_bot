@@ -44,6 +44,10 @@ register-help:
 clean:
 	rm -rf .pytest_cache .ruff_cache **/__pycache__ reports
 
+PLIST_NAME := com.user.trading-bot-monitor
+USER_PLIST_PATH := $(HOME)/Library/LaunchAgents/$(PLIST_NAME).plist
+LAUNCHD_DOMAIN := gui/$(shell id -u)
+
 monitor-once:
 	$(PYTHON) -m mcp_server.monitor
 
@@ -51,7 +55,16 @@ monitor-dry-run:
 	$(PYTHON) -m mcp_server.monitor --dry-run
 
 monitor-install:
-	@echo "monitor-install: launchctl bootstrap lands in Prompt 5"
+	@mkdir -p $(HOME)/Library/LaunchAgents $(HOME)/Library/Logs
+	$(PYTHON) scripts/render_plist.py > $(USER_PLIST_PATH)
+	-launchctl bootout $(LAUNCHD_DOMAIN)/$(PLIST_NAME) 2>/dev/null || true
+	launchctl bootstrap $(LAUNCHD_DOMAIN) $(USER_PLIST_PATH)
+	@echo ""
+	@echo "Installed: $(USER_PLIST_PATH)"
+	@echo "Logs:      $(HOME)/Library/Logs/trading-bot-monitor.log"
+	@echo "Status:    launchctl print $(LAUNCHD_DOMAIN)/$(PLIST_NAME)"
 
 monitor-uninstall:
-	@echo "monitor-uninstall: launchctl bootout lands in Prompt 5"
+	-launchctl bootout $(LAUNCHD_DOMAIN)/$(PLIST_NAME) 2>/dev/null || true
+	rm -f $(USER_PLIST_PATH)
+	@echo "Removed: $(USER_PLIST_PATH)"
