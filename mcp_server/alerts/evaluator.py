@@ -25,6 +25,7 @@ import pandas as pd
 from mcp_server.alerts.connection import get_alert_store
 from mcp_server.alerts.store import AlertStore
 from mcp_server.analysis.technicals import rsi, sma
+from mcp_server.notifier import email as email_mod
 from mcp_server.tools.data_tools import get_current_quote, get_price_history
 
 log = logging.getLogger(__name__)
@@ -442,6 +443,22 @@ def evaluate_alerts(
             )
         fires.append(fire)
 
+    email_result: dict | None = None
+    if fires and not dry_run:
+        if email_mod.is_configured():
+            try:
+                email_result = email_mod.send_digest(fires, now=now)
+                if not email_result.get("sent"):
+                    errors.append(f"email send failed: {email_result.get('error')}")
+            except Exception as e:
+                log.exception("digest send raised")
+                errors.append(f"email send raised: {e}")
+        else:
+            log.info(
+                "SMTP not configured; %d fire(s) recorded but no email sent",
+                len(fires),
+            )
+
     return {
         "evaluated": len(alerts),
         "fired": len(fires),
@@ -449,4 +466,5 @@ def evaluate_alerts(
         "errors": errors,
         "fires": fires,
         "dry_run": dry_run,
+        "email": email_result,
     }

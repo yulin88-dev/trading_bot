@@ -1,5 +1,11 @@
-"""MCP tool stub for SMTP notification. Real logic lands in Prompt 4."""
+"""MCP tool for SMTP notification."""
 from __future__ import annotations
+
+import logging
+
+from mcp_server.notifier import email as email_mod
+
+log = logging.getLogger(__name__)
 
 
 def send_test_email(to: str | None = None, body: str | None = None) -> dict:
@@ -10,11 +16,13 @@ def send_test_email(to: str | None = None, body: str | None = None) -> dict:
         body: Optional body text override.
 
     Returns:
-        Dict with sent (bool), rendered (the raw MIME message), error.
+        Dict with sent (bool), rendered (the raw MIME string), error.
     """
-    return {
-        "_stub": True,
-        "sent": False,
-        "rendered": "",
-        "error": "not implemented (lands in Prompt 4)",
-    }
+    try:
+        return email_mod.send_test(to=to, body=body)
+    except RuntimeError as e:
+        # Missing env vars surface as a clear, actionable error.
+        return {"sent": False, "rendered": "", "error": str(e)}
+    except Exception as e:
+        log.exception("send_test_email failed")
+        return {"sent": False, "rendered": "", "error": str(e)}
