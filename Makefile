@@ -1,4 +1,4 @@
-.PHONY: help install test smoke-data smoke-analysis report run register-help clean
+.PHONY: help install test smoke-data smoke-analysis report run register-help clean monitor-once monitor-dry-run monitor-install monitor-uninstall
 
 PYTHON := python3
 
@@ -13,6 +13,12 @@ help:
 	@echo "  make run              Launch the MCP server (stdio; for debugging)"
 	@echo "  make register-help    Print Claude Desktop config block to paste"
 	@echo "  make clean            Remove caches and the reports/ directory"
+	@echo ""
+	@echo "  v2 monitor:"
+	@echo "  make monitor-once       Run mcp_server.monitor once (real eval lands in Prompt 5)"
+	@echo "  make monitor-dry-run    Same, with --dry-run"
+	@echo "  make monitor-install    launchctl bootstrap the plist (Prompt 5)"
+	@echo "  make monitor-uninstall  launchctl bootout the plist (Prompt 5)"
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -37,3 +43,15 @@ register-help:
 
 clean:
 	rm -rf .pytest_cache .ruff_cache **/__pycache__ reports
+
+monitor-once:
+	$(PYTHON) -m mcp_server.monitor
+
+monitor-dry-run:
+	$(PYTHON) -m mcp_server.monitor --dry-run
+
+monitor-install:
+	@echo "monitor-install: launchctl bootstrap lands in Prompt 5"
+
+monitor-uninstall:
+	@echo "monitor-uninstall: launchctl bootout lands in Prompt 5"

@@ -6,7 +6,13 @@
       "cwd": "/Users/yulin/projects/trading_bot",
       "env": {
         "ALPACA_API_KEY": "your_paper_key_here",
-        "ALPACA_SECRET_KEY": "your_paper_secret_here"
+        "ALPACA_SECRET_KEY": "your_paper_secret_here",
+        "SMTP_HOST": "smtp.gmail.com",
+        "SMTP_PORT": "587",
+        "SMTP_USER": "you@gmail.com",
+        "SMTP_PASSWORD": "your_gmail_app_password",
+        "ALERT_EMAIL_FROM": "you@gmail.com",
+        "ALERT_EMAIL_TO": "you@gmail.com"
       }
     }
   }

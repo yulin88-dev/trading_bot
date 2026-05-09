@@ -10,6 +10,11 @@ Two parts live here:
 2. **MCP server (`mcp_server/`)** — exposes weekly market analysis tools to
    Claude Desktop. Generates a markdown report for **TSLA**, **BRK-B**, and
    **BTC**. See [DESIGN.md](DESIGN.md) for the full design.
+3. **v2 — monitor + alerts (in progress)** — entry-point alerts evaluated on
+   a launchd schedule during NYSE hours, emailed via Gmail SMTP. See
+   [DESIGN3.md](DESIGN3.md) and [MCP_SERVER_PROMPTS3.md](MCP_SERVER_PROMPTS3.md).
+   Currently scaffolded with stubs (Prompt 2); CRUD, evaluation, and email
+   land in Prompts 3–6.
 
 ## Requirements
 

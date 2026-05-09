@@ -9,8 +9,7 @@ server watches during market hours and emails you when an alert fires.
 
 Fill these in before using the prompts below:
 
-- **Email delivery**:
-  system `mail` command
+- **Email delivery**: Gmail SMTP via stdlib `smtplib` (Gmail app password)
 - **Recipient**: a single email address
 - **Storage**: reuse the existing `reports/` directory pattern with JSON files
 - **Schedule trigger**: launchd timer (every 10 min during market hours)
