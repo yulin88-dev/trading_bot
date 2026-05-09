@@ -442,6 +442,15 @@ def evaluate_alerts(
                 now=now,
             )
         fires.append(fire)
+        log.info(
+            "fire alert_id=%s symbol=%s condition=%s observed=%s threshold=%s dry_run=%s",
+            alert["id"],
+            alert["symbol"],
+            alert["condition_type"],
+            result["observed_value"],
+            result["threshold"],
+            dry_run,
+        )
 
     email_result: dict | None = None
     if fires and not dry_run:
